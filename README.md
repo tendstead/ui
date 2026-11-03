@@ -1,6 +1,6 @@
 # @tendstead/ui
 
-Private, local Svelte 5 / TypeScript shell for independent Tendstead tools. This is a working package and synthetic demo, with no backend, authentication, or live downloads. No license has been selected; do not publish it yet.
+Svelte 5 / TypeScript shell for independent Tendstead tools. This is a working package and synthetic demo, with no backend, authentication, or live downloads. Licensed under the [MIT License](LICENSE).
 
 ```sh
 npm ci
