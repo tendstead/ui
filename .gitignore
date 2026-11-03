@@ -4,3 +4,4 @@ demo-dist/
 test-results/
 playwright-report/
 .superpowers/
+.svelte-kit/
