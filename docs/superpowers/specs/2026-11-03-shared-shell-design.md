@@ -16,7 +16,7 @@ A small composed Svelte shell lets independent household tools share familiar na
 - Drawer: accessible name, focus trap/return, Escape/outside dismissal, background inert/scroll lock, safe cleanup on unmount and desktop resize. Evaluate Melt Dialog 0.86.x compatibility first; one primitive only. Approximately 44px effective touch targets, safe-area accommodation, no overlap/clipped content. Long/German labels wrap.
 
 ## Demo and delivery
-Interactive synthetic receipt and no-login downloader demos; fixture controls for theme, long labels, account/service configuration. No backend behaviors implied. Include a form/long content to test scroll clearance. Independent package consumption (demo imports package exports/built dist, not unpublished source alias).
+Receipt demo includes Collections/Statistics under Explore, zero-count Review queue and optional Administration. Also check reduced-height mobile 393x430. Interactive synthetic receipt and no-login downloader demos; fixture controls for theme, long labels, account/service configuration. No backend behaviors implied. Include a form/long content to test scroll clearance. Independent package consumption (demo imports package exports/built dist, not unpublished source alias).
 Docker dev/build/static-demo instructions; reproducible lockfile; CI with checks/build/unit/browser/visual artifacts; no remote publishing/deployment. MIT suggested but not selected: do not add an unapproved license. Keep package private for now.
 
 ## Acceptance and tests
