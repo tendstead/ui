@@ -1,0 +1,148 @@
+name: Release package
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: release-main
+  cancel-in-progress: false
+jobs:
+  plan:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    # GitHub only returns draft releases to callers with push access.
+    # This job runs metadata scripts only, never npm ci or package code.
+    permissions:
+      contents: write
+      pull-requests: read
+    outputs:
+      version: ${{ steps.plan.outputs.version }}
+      sha: ${{ steps.plan.outputs.sha }}
+      notes-id: ${{ steps.notes.outputs.artifact-id }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: main
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '26.13.0'
+      - name: Plan release
+        id: plan
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
+        with:
+          script: |
+            const {default: plan} = await import(`${process.env.GITHUB_WORKSPACE}/scripts/plan-release.mjs`);
+            await plan({github, context, core});
+      - name: Preserve release notes
+        if: steps.plan.outputs.version != ''
+        id: notes
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: release-notes-${{ steps.plan.outputs.version }}
+          path: /tmp/tendstead-release-notes.md
+          if-no-files-found: error
+          retention-days: 7
+  build:
+    name: Verify and pack release
+    needs: plan
+    if: needs.plan.outputs.version != ''
+    timeout-minutes: 15
+    outputs:
+      version: ${{ needs.plan.outputs.version }}
+      sha: ${{ needs.plan.outputs.sha }}
+      artifact-id: ${{ steps.artifact.outputs.artifact-id }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    container:
+      image: mcr.microsoft.com/playwright:v1.63.0-noble
+      options: --ipc=host
+    env:
+      # GitHub mounts /github/home for another user; Firefox runs as root.
+      HOME: /root
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ needs.plan.outputs.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '26.13.0'
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          artifact-ids: ${{ needs.plan.outputs.notes-id }}
+          merge-multiple: true
+          path: /tmp
+      - if: needs.plan.outputs.version != ''
+        run: npm ci
+      - name: Set artifact version
+        if: needs.plan.outputs.version != ''
+        env:
+          RELEASE_VERSION: ${{ needs.plan.outputs.version }}
+        run: npm version "$RELEASE_VERSION" --no-git-tag-version --ignore-scripts
+      - name: Verify release
+        if: needs.plan.outputs.version != ''
+        run: npm run verify
+      - name: Pack verified library
+        if: needs.plan.outputs.version != ''
+        run: npm pack --pack-destination /tmp
+      - name: Preserve verified release inputs
+        if: needs.plan.outputs.version != ''
+        id: artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: npm-release-${{ needs.plan.outputs.version }}
+          path: |
+            /tmp/tendstead-ui-${{ needs.plan.outputs.version }}.tgz
+            /tmp/tendstead-release-notes.md
+          if-no-files-found: error
+          retention-days: 7
+  publish:
+    needs: build
+    if: github.repository == 'tendstead/ui' && github.ref == 'refs/heads/main' && needs.build.outputs.version != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: npm
+    permissions:
+      contents: write
+      id-token: write
+      actions: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ needs.build.outputs.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '26.13.0'
+          registry-url: 'https://registry.npmjs.org'
+      - name: Install pinned npm CLI with OIDC support
+        run: npm install --global npm@11.19.0 --ignore-scripts
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          artifact-ids: ${{ needs.build.outputs.artifact-id }}
+          merge-multiple: true
+          path: ${{ runner.temp }}/release
+      - name: Publish verified package and GitHub release
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
+        env:
+          RELEASE_VERSION: ${{ needs.build.outputs.version }}
+          RELEASE_SHA: ${{ needs.build.outputs.sha }}
+        with:
+          script: |
+            const {default: publish} = await import(`${process.env.GITHUB_WORKSPACE}/scripts/publish-release.mjs`);
+            await publish({github, context, artifactDirectory: `${process.env.RUNNER_TEMP}/release`});
+      # A successful run can finish a pending older release while main has
+      # advanced. Queue one more scan; no-op scans do not dispatch again.
+      - name: Process any remaining merged PRs
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
+        with:
+          script: |
+            await github.rest.actions.createWorkflowDispatch({
+              ...context.repo, workflow_id: 'release.yml', ref: 'main'
+            });

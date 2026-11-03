@@ -1,4 +1,9 @@
 .git
+.agents
+.codex
+.aws
+.env
+.env.*
 .superpowers
 node_modules
 dist
