@@ -45,5 +45,5 @@
 - [x] Run full verification; report test/browser counts, image review and remaining constraints; commit if Git available.
 
 ### Final review and lead verification
-- [ ] Independent whole-project review against spec, tests and consumer boundaries; fix important findings with regression tests and scoped review.
+- [x] Independent whole-project review against spec, tests and consumer boundaries; fix important findings with regression tests and scoped review.
 - [x] Run full checks and review generated screenshots; report exact evidence and remaining human baseline/phone review.

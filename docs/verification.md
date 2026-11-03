@@ -33,6 +33,8 @@ No tests skipped, axe rules excluded, screenshot regions masked or custom image-
 
 ## Visual and manual acceptance
 
+Independent whole-project review found two usability issues beyond the initial suite: document-height desktop navigation and duplicate account snippet IDs. Both were reproduced with failing browser tests, fixed in `fcc6244`, and approved in a scoped re-review. The lead then rebuilt the final test image and repeated full verification: exit 0, 6 unit tests, 114 cross-browser tests, 18 visual comparisons, check/build and independent packed consumer/SSR passed. A live Chromium smoke check of the final local static demo passed account label focus/ID uniqueness and downloader interaction.
+
 Canonical reference images are committed in `tests/screenshots/`. The lead inspected representative desktop/mobile, dark long-label drawer and reduced-height drawer captures; the implementer inspected all 18 compositions. These references remain provisional until the owner reviews the design. Ordinary visual tests compare but never update them; use the separate explicit container update workflow in CONTRIBUTING.md.
 
 Real phone safe areas, screen reader behavior, text zoom, touch and software-keyboard checks remain manual. App-specific router and server authorization integrations require testing in each consumer. Automated checks do not guarantee every visual or accessibility defect is caught.
