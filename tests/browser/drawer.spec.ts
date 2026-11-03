@@ -91,3 +91,31 @@ test('open drawer retains focus through reactive permission and account removal'
   expect(await page.locator('[data-shell-background]').evaluate((el:HTMLElement)=>el.inert)).toBe(false);
   expect(await page.locator('body').evaluate(el=>getComputedStyle(el).overflow)).not.toBe('hidden');
 });
+
+// Catches rendering one consumer snippet twice: explicit IDs must stay unique.
+test('account label targets its single visible input across drawer and breakpoint transitions',async({page})=>{
+  await page.setViewportSize({width:767,height:800});
+  await page.goto('/?account=1&accountForm=1');
+  const input=page.locator('[id="demo-account-name"]');
+  await expect(input).toHaveCount(1);
+  for(let cycle=0;cycle<2;cycle++){
+    await page.getByRole('button',{name:'Menu',exact:true}).click();
+    const drawer=page.getByRole('dialog');
+    await expect(drawer).toBeVisible();
+    await expect(input).toHaveCount(1);
+    await drawer.locator('label[for="demo-account-name"]').click();
+    await expect(input).toBeFocused();await expect(input).toBeVisible();
+    await page.setViewportSize({width:768,height:800});
+    await expect(drawer).toBeHidden();
+    await expect(input).toHaveCount(1);
+    await page.locator('.ts-sidebar label[for="demo-account-name"]').click();
+    await expect(input).toBeFocused();await expect(input).toBeVisible();
+    await page.setViewportSize({width:767,height:800});
+    await expect(input).toHaveCount(1);
+  }
+  await page.getByRole('button',{name:'Menu',exact:true}).click();
+  await page.keyboard.press('Escape');
+  await expect(page.getByRole('dialog')).toBeHidden();
+  await expect(input).toHaveCount(1);
+  await expect(page.getByRole('button',{name:'Menu',exact:true})).toBeFocused();
+});

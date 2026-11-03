@@ -23,7 +23,8 @@
 .ts-shell-background { display:grid; grid-template-columns:256px minmax(0,1fr); min-height:100dvh; }
 .ts-skip { position:fixed; top:8px; left:16px; z-index:100; padding:12px; background:var(--ts-surface); transform:translateY(-180%); }
 .ts-skip:focus { transform:none; }
-.ts-sidebar { background:var(--ts-nav); color:var(--ts-on-nav); border-right:1px solid var(--ts-border); padding:32px 16px 20px; display:flex; flex-direction:column; gap:24px; }
+.ts-sidebar { position:sticky; top:0; align-self:start; height:100dvh; overflow-y:auto; overscroll-behavior:contain; background:var(--ts-nav); color:var(--ts-on-nav); border-right:1px solid var(--ts-border); padding:32px 16px 20px; display:flex; flex-direction:column; gap:24px; }
+.ts-sidebar > * { flex-shrink:0; }
 .ts-brand { display:flex; align-items:center; gap:12px; margin:0 8px 14px; overflow-wrap:anywhere; }
 .ts-brand strong { display:block; font-size:20px; letter-spacing:-.5px; }
 .ts-brand-mark { display:grid; place-items:center; height:40px; width:40px; flex-shrink:0; border:1px solid var(--ts-border); border-radius:12px; font-size:28px; color:var(--ts-primary); font-weight:600; }

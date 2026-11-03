@@ -65,11 +65,12 @@
 <div class="ts-shell" style:--ts-mobile-space={`${barHeight+24}px`}>
   <div class="ts-shell-background" data-shell-background inert={$open}>
     <a class="ts-skip" href={`#${uid}-content`}>Skip to content</a>
-    <aside class="ts-sidebar">
+    <!-- svelte-ignore a11y_no_noninteractive_tabindex (The named overflow region must support native keyboard scrolling.) -->
+    <aside class="ts-sidebar" aria-label="Application sidebar" tabindex="0">
       {@render brandBlock()}
       <nav class="ts-main-nav" aria-label="Main navigation"><NavigationList destinations={available} {groups} activeId={active?.id} onclick={navigate}/></nav>
       {@render servicesBlock()}
-      {#if account}<div class="ts-account">{@render account()}</div>{/if}
+      {#if account && !$open}<div class="ts-account">{@render account()}</div>{/if}
       <p class="ts-sidebar-note">A little more in order.</p>
     </aside>
     <div class="ts-workspace">

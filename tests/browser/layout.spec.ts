@@ -41,3 +41,38 @@ test('theme leaves app content links under app control',async({page})=>{
   });
   expect(styles.actual).toEqual(styles.reference);
 });
+
+// Catches a sidebar stretched to document height or moving out of view with content.
+for (const viewport of [{width:1280,height:800},{width:873,height:393}]) {
+  test(`desktop sidebar stays reachable while document scrolls ${viewport.width}x${viewport.height}`,async({page})=>{
+    await page.setViewportSize(viewport);
+    await page.goto('/?long=1&services=1&account=1&admin=1');
+    const sidebar=page.locator('.ts-sidebar');
+    await page.getByRole('button',{name:'End of page action',exact:true}).scrollIntoViewIfNeeded();
+    const documentScroll=await page.evaluate(()=>window.scrollY);
+    expect(documentScroll).toBeGreaterThan(0);
+    const bounds=await sidebar.boundingBox();
+    expect(bounds!.y).toBeGreaterThanOrEqual(0);
+    expect(bounds!.y+bounds!.height).toBeLessThanOrEqual(viewport.height);
+    expect(await sidebar.evaluate(el=>el.scrollHeight>el.clientHeight)).toBe(true);
+    await sidebar.focus();
+    await expect(sidebar).toBeFocused();
+    await page.keyboard.press('End');
+    await expect.poll(()=>sidebar.evaluate(el=>el.scrollTop)).toBeGreaterThan(0);
+    const service=sidebar.getByRole('link',{name:'Shopping list'});
+    // Observe a real click without leaving the local fixture for an external service.
+    await service.evaluate(el=>el.addEventListener('click',event=>{event.preventDefault();el.setAttribute('data-clicked','true');},{once:true}));
+    await service.scrollIntoViewIfNeeded();await service.click();
+    await expect(service).toHaveAttribute('data-clicked','true');
+    const account=sidebar.getByRole('button',{name:'Alex · local account'});
+    await account.scrollIntoViewIfNeeded();await account.click();
+    await expect(page.getByRole('status')).toHaveText('Demo account controls opened');
+    expect(await page.evaluate(()=>window.scrollY)).toBe(documentScroll);
+    const primary=sidebar.getByRole('link',{name:'Haushaltsübersicht und Zusammenfassung'});
+    await primary.scrollIntoViewIfNeeded();await primary.click();
+    await expect(page.getByRole('heading',{level:1})).toHaveText('Overview');
+    const primaryBounds=await primary.boundingBox();
+    expect(primaryBounds!.y).toBeGreaterThanOrEqual(0);
+    expect(primaryBounds!.y+primaryBounds!.height).toBeLessThanOrEqual(viewport.height);
+  });
+}

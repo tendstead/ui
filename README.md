@@ -9,7 +9,7 @@ npm run build               # dist package + demo-dist static demo
 npm run preview             # built demo, port 4173 by default
 ```
 
-Requires Node 22 and Svelte >=5.20. The demo consumes the package's built exports, as an independent app would. Source changes rebuild `dist` in dev mode. Demo links update history; Back/Forward work. Try `/?app=downloader` or `/?theme=dark&long=1&services=1&account=1`. `route=/receipts/review/42`, `controls=1`, `admin=1`, and `denied=1` provide deterministic fixtures. Expand Demo configuration for reactive controls. Receipt Menu includes Collections and Statistics under Explore, a zero-badge Review queue, and optional Administration (`admin=1` or its fixture control). Connected-service examples are synthetic Shopping list (receipts) and Media library (downloader) links supplied by the demo, with no package-owned catalog. All sample data and actions stay local.
+Requires Node 22 and Svelte >=5.20. The demo consumes the package's built exports, as an independent app would. Source changes rebuild `dist` in dev mode. Demo links update history; Back/Forward work. Try `/?app=downloader` or `/?theme=dark&long=1&services=1&account=1`. `route=/receipts/review/42`, `controls=1`, `admin=1`, and `denied=1` provide deterministic fixtures. Add `accountForm=1&account=1` to exercise consumer account labels and explicit input IDs. Expand Demo configuration for reactive controls. Receipt Menu includes Collections and Statistics under Explore, a zero-badge Review queue, and optional Administration (`admin=1` or its fixture control). Connected-service examples are synthetic Shopping list (receipts) and Media library (downloader) links supplied by the demo, with no package-owned catalog. All sample data and actions stay local.
 
 ## Use in an app
 
@@ -34,7 +34,7 @@ Build and `npm pack` locally, then install the resulting tarball in your app. Im
 </AppShell>
 ```
 
-The package exports `AppShell` and `AppShellProps`, `Destination`, `NavigationGroup`, `ServiceLink`, `PrimaryAction`, `ShellIcon` types. Destinations have unique IDs and optional app-supplied Svelte icon components, `groupId`, `badge` (including zero), `visible`, `permitted` and `match: 'exact' | 'prefix'`. Supply `groups={[{id:'manage',label:'Manage'}]}` to label groups. Most specific segment-aware route wins; query/hash are ignored. Filtered or unknown mobile IDs disappear; every permitted destination remains in Menu. Keep primary IDs to a small curated set. Primary actions support `href` or `onclick`; account and pageActions are optional Svelte snippets.
+The package exports `AppShell` and `AppShellProps`, `Destination`, `NavigationGroup`, `ServiceLink`, `PrimaryAction`, `ShellIcon` types. Destinations have unique IDs and optional app-supplied Svelte icon components, `groupId`, `badge` (including zero), `visible`, `permitted` and `match: 'exact' | 'prefix'`. Supply `groups={[{id:'manage',label:'Manage'}]}` to label groups. Active matching expects root-relative destination paths such as `/receipts`; the most specific segment-aware route wins, and query/hash are ignored. Relative hrefs are allowed for navigation but are not resolved against the current route for active matching. Filtered or unknown mobile IDs disappear; every permitted destination remains in Menu. Keep primary IDs to a small curated set. Primary actions support `href` or `onclick`; account and pageActions are optional Svelte snippets.
 
 Links use normal browser navigation. For client routing, supply `onNavigate={(event, destination) => { event.preventDefault(); router.goto(destination.href); }}` and feed the current pathname back to the shell. The callback runs for ordinary left clicks only; modified clicks retain browser behavior. The shell does not intercept unrelated content links. Apps own route transitions, data, authorization and document titles.
 
@@ -53,7 +53,7 @@ Pass `serviceLinks` to the shell. Empty is the default, with no placeholder sect
 
 Set `data-theme="dark"` or `data-theme="light"` on an ancestor. Override `--ts-primary`, `--ts-on-primary`, `--ts-nav`, `--ts-on-nav`, `--ts-selection`, `--ts-on-selection`, `--ts-surface`, `--ts-surface-subtle`, `--ts-text`, `--ts-muted`, `--ts-border`, `--ts-focus`, and `--ts-font` there. Defaults use neutral surfaces and purple `#6750A4`; token changes need contrast review. Theme CSS applies shell geometry and box sizing inside the shell; ordinary content links retain app/browser styling. No external fonts or images are fetched.
 
-Desktop sidebar starts at 768 CSS px. Smaller layouts use primary navigation and a complete modal drawer with focus trapping/return, Escape/backdrop dismissal, inert background, scroll lock, and resize/unmount cleanup. Bottom clearance follows the measured navigation height; safe areas are included. Your content must still wrap responsibly.
+Desktop sidebar starts at 768 CSS px. It stays within the viewport while the document scrolls, and its own scroll area is keyboard focusable for short screens and long destination maps. Smaller layouts use primary navigation and a complete modal drawer with focus trapping/return, Escape/backdrop dismissal, inert background, scroll lock, and resize/unmount cleanup. Bottom clearance follows the measured navigation height; safe areas are included. Your content must still wrap responsibly.
 
 ## Docker
 

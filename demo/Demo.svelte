@@ -7,6 +7,7 @@
   let theme=$state(query.get('theme')==='dark'?'dark':'light');
   let long=$state(query.get('long')==='1');
   let showAccount=$state(query.get('account')==='1');
+  const accountForm=query.get('accountForm')==='1';
   let showServices=$state(query.get('services')==='1');
   let permitted=$state(query.get('denied')!=='1');
   let showAdmin=$state(query.get('admin')==='1');
@@ -47,7 +48,9 @@
 
 <div data-theme={theme} class="demo-root">
   {#snippet account()}
+    {#if accountForm}<label for="demo-account-name">Account name</label><input id="demo-account-name" value="Alex"/>{:else}
     <button class="demo-account" type="button" onclick={()=>status='Demo account controls opened'}><span class="demo-avatar" aria-hidden="true">A</span><span>Alex · local account</span></button>
+    {/if}
   {/snippet}
   {#if mounted}
     <AppShell brand="Tendstead" appLabel={downloader?'Downloader':'Receipts'} pageTitle={activeTitle} {pathname} {destinations} {groups}
