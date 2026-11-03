@@ -9,13 +9,14 @@
   let showAccount=$state(query.get('account')==='1');
   let showServices=$state(query.get('services')==='1');
   let permitted=$state(query.get('denied')!=='1');
+  let showAdmin=$state(query.get('admin')==='1');
   let mounted=$state(true);
   let pathname=$state(query.get('route')??window.location.pathname);
   let status=$state('');
   let url=$state('');
   let receiptName=$state('');
   let queued=$state(2);
-  let activeTitle=$derived(downloader ? (pathname.startsWith('/history')?'History':pathname.startsWith('/settings')?'Settings':'Downloads') : (pathname==='/add'?'Add receipt':pathname.startsWith('/receipts/review')?'Review queue':pathname.startsWith('/receipts')?'Receipts':pathname.startsWith('/search')?'Search':pathname.startsWith('/settings')?'Settings':'Overview'));
+  let activeTitle=$derived(downloader ? (pathname.startsWith('/history')?'History':pathname.startsWith('/settings')?'Settings':'Downloads') : (pathname==='/collections'?'Collections':pathname==='/statistics'?'Statistics':pathname==='/admin'?'Administration':pathname==='/add'?'Add receipt':pathname.startsWith('/receipts/review')?'Review queue':pathname.startsWith('/receipts')?'Receipts':pathname.startsWith('/search')?'Search':pathname.startsWith('/settings')?'Settings':'Overview'));
   let destinations=$derived<Destination[]>(downloader ? [
     {id:'downloads',label:long?'Aktuelle und ausstehende Downloads':'Downloads',href:'/',icon:FolderDown,match:'exact',badge:queued,groupId:'workspace'},
     {id:'history',label:long?'Vollständiger Downloadverlauf':'History',href:'/history',icon:History,groupId:'workspace'},
@@ -24,12 +25,15 @@
   ] : [
     {id:'overview',label:long?'Haushaltsübersicht und Zusammenfassung':'Overview',href:'/',icon:LayoutDashboard,match:'exact',groupId:'workspace'},
     {id:'receipts',label:long?'Belege und Haushaltsabrechnungen':'Receipts',href:'/receipts',icon:ReceiptText,badge:0,permitted,groupId:'workspace'},
-    {id:'review',label:long?'Belege zur Überprüfung und Freigabe':'Review queue',href:'/receipts/review',icon:ListChecks,badge:3,permitted,groupId:'workspace'},
+    {id:'review',label:long?'Belege zur Überprüfung und Freigabe':'Review queue',href:'/receipts/review',icon:ListChecks,badge:0,permitted,groupId:'workspace'},
     {id:'search',label:long?'Belege und Dokumente durchsuchen':'Search',href:'/search',icon:Search,groupId:'workspace'},
     {id:'settings',label:long?'Einstellungen und Haushaltsverwaltung':'Settings',href:'/settings',icon:Settings,groupId:'manage'},
+    {id:'collections',label:'Collections',href:'/collections',icon:FolderDown,groupId:'explore'},
+    {id:'statistics',label:'Statistics',href:'/statistics',icon:LayoutDashboard,groupId:'explore'},
+    {id:'administration',label:'Administration',href:'/admin',icon:Settings,permitted:showAdmin,groupId:'administration'},
     {id:'private',label:'Private admin',href:'/admin',icon:Settings,visible:false,groupId:'manage'},
   ]);
-  const groups=[{id:'workspace',label:'Workspace'},{id:'manage',label:'Manage'}];
+  const groups=[{id:'workspace',label:'Workspace'},{id:'explore',label:'Explore'},{id:'manage',label:'Manage'},{id:'administration',label:'Administration'}];
   function go(href:string) {
     pathname=href;
     const search=new URLSearchParams(window.location.search); search.delete('route');
@@ -49,7 +53,7 @@
     <AppShell brand="Tendstead" appLabel={downloader?'Downloader':'Receipts'} pageTitle={activeTitle} {pathname} {destinations} {groups}
       mobilePrimaryIds={downloader?['downloads','history']:['overview','receipts','search']}
       primaryAction={{id:'add',label:downloader?'New download':'Add',icon:downloader?Download:Plus,onclick:add}}
-      serviceLinks={showServices?[{id:'other',label:downloader?'Receipts':'Downloader',href:downloader?'https://receipts.example.test/':'https://downloader.example.test/',icon:downloader?ReceiptText:FolderDown}]:[]}
+      serviceLinks={showServices?[{id:'other',label:downloader?'Media library':'Shopping list',href:downloader?'https://media.example.test/':'https://shopping.example.test/',icon:downloader?FolderDown:ListChecks}]:[]}
       account={showAccount?account:undefined} onNavigate={navigate}>
       {#snippet pageActions()}<button class="demo-subtle-button" onclick={()=>status='Synthetic export prepared'} type="button"><ArrowUpRight size={16} aria-hidden="true"/><span>Export</span></button>{/snippet}
       <div class="demo-intro"><p class="demo-kicker">YOUR HOUSEHOLD, A LITTLE LIGHTER</p><h2>{downloader?'Bring your downloads together.':'Room for the everyday.'}</h2><p>{downloader?'Keep track of files in one calm place.':'Keep receipts close, find what you need, and carry on with your day.'}</p></div>
@@ -63,7 +67,7 @@
       {/if}
       <div class="demo-stats"><section class="demo-stat"><p>{downloader?'In the queue':'This month'}</p><strong>{downloader?queued:'€284.50'}</strong><span>{downloader?'Ready when you are':'Across 12 receipts'}</span></section><section class="demo-stat"><p>{downloader?'Completed':'Ready to review'}</p><strong>{downloader?'18':'3'}</strong><span>{downloader?'Sample downloads':'A quick check is all it takes'}</span></section><section class="demo-stat"><p>{downloader?'Storage used':'Your archive'}</p><strong>{downloader?'2.4 GB':'148'}</strong><span>{downloader?'Synthetic files':'Receipts, neatly kept'}</span></section></div>
       <section class="demo-card" aria-labelledby="activity-title"><div class="demo-card-header"><div><p class="demo-kicker">AT A GLANCE</p><h2 id="activity-title">{downloader?'Recent downloads':'Recent receipts'}</h2></div><span class="demo-tag">Sample data</span></div><div class="demo-items">{#each (downloader?['Household manual.pdf','Weekend photos.zip','Garden notes.txt']:['Weekly groceries','Home essentials','Coffee with friends','Garden supplies']) as label,index}<div class="demo-item"><span class="demo-file-icon" aria-hidden="true"><FileText size={20}/></span><div><strong>{label}</strong><span>{['31 October 2026','29 October 2026','28 October 2026','26 October 2026'][index]} · {downloader?'Complete':'Personal'}</span></div><span class="demo-item-value">{downloader?['4.2 MB','128 MB','12 KB'][index]:['€68.40','€24.90','€12.80','€47.60'][index]}</span></div>{/each}</div></section>
-      <details class="demo-fixtures" open={query.get('controls')==='1'}><summary>Demo configuration</summary><div class="demo-controls"><label>Appearance<select bind:value={theme}><option value="light">Light</option><option value="dark">Dark</option></select></label><label><input type="checkbox" bind:checked={long}/>Long German labels</label><label><input type="checkbox" bind:checked={showServices}/>Show connected services</label><label><input type="checkbox" bind:checked={showAccount}/>Show account controls</label>{#if !downloader}<label><input type="checkbox" bind:checked={permitted}/>Allow receipt access</label>{/if}<p class="demo-help">App servers must enforce permissions. These controls only change navigation presentation.</p></div></details>
+      <details class="demo-fixtures" open={query.get('controls')==='1'}><summary>Demo configuration</summary><div class="demo-controls"><label>Appearance<select bind:value={theme}><option value="light">Light</option><option value="dark">Dark</option></select></label><label><input type="checkbox" bind:checked={long}/>Long German labels</label><label><input type="checkbox" bind:checked={showServices}/>Show connected services</label><label><input type="checkbox" bind:checked={showAccount}/>Show account controls</label>{#if !downloader}<label><input type="checkbox" bind:checked={permitted}/>Allow receipt access</label>{/if}{#if !downloader}<label><input type="checkbox" bind:checked={showAdmin}/>Show Administration</label>{/if}<p class="demo-help">App servers must enforce permissions. These controls only change navigation presentation.</p></div></details>
       <section class="demo-card demo-notes"><h2>A place for the small things</h2><p>This page intentionally includes enough content to scroll. The shell keeps the last control clear of the mobile navigation.</p><p>Each household tool owns its data, routes, and permissions. Connected services are ordinary links to independently deployed apps.</p><button class="demo-subtle-button" type="button" onclick={()=>status='End of page action received'}>End of page action</button></section>
       <p role="status" class="demo-status">{status}</p>
       <button class="demo-subtle-button demo-unmount" type="button" onclick={()=>mounted=false}>Unmount shell</button>

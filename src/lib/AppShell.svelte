@@ -20,6 +20,20 @@
     onNavigate?.(event,destination);
     open.set(false);
   }
+  // Recover focus when reactive app configuration removes the focused snippet.
+  // Melt remains responsible for trapping and returning focus during normal use.
+  function recoverDetachedFocus(node:HTMLElement) {
+    let focused:Element|null=node.contains(document.activeElement)?document.activeElement:null;
+    const remember=(event:FocusEvent)=>{ focused=event.target as Element; };
+    node.addEventListener('focusin',remember);
+    const observer=new MutationObserver(()=>{
+      if(focused && !focused.isConnected && !node.contains(document.activeElement)) {
+        node.focus({preventScroll:true});
+      }
+    });
+    observer.observe(node,{childList:true,subtree:true});
+    return {destroy(){ observer.disconnect();node.removeEventListener('focusin',remember); }};
+  }
   onMount(()=>{
     const desktop=window.matchMedia('(min-width: 768px)');
     const resized=()=>{ if(desktop.matches) open.set(false); };
@@ -78,7 +92,7 @@
   </div>
   {#if $open}
     <div class="ts-overlay" data-drawer-overlay {...$overlay} use:overlay></div>
-    <div class="ts-drawer" {...$content} use:content>
+    <div class="ts-drawer" {...$content} use:content use:recoverDetachedFocus>
       <div class="ts-drawer-heading"><h2 {...$title} use:title>All destinations</h2><button class="ts-icon-button" aria-label="Close menu" {...$close} use:close>✕</button></div>
       <p class="ts-drawer-description" {...$description} use:description>{brand} · {appLabel}</p>
       <nav class="ts-drawer-nav" aria-label="All navigation"><NavigationList destinations={available} {groups} activeId={active?.id} onclick={navigate}/></nav>

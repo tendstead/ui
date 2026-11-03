@@ -1,0 +1,25 @@
+services:
+  dev:
+    build:
+      context: .
+      target: dev
+    ports: ["127.0.0.1:5173:5173"]
+    volumes:
+      - ./src:/app/src:ro
+      - ./demo:/app/demo:ro
+    init: true
+  demo:
+    build:
+      context: .
+      target: demo
+    ports: ["127.0.0.1:8080:8080"]
+    init: true
+  test:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+    ipc: host
+    volumes:
+      - ./test-results:/work/test-results
+      - ./playwright-report:/work/playwright-report
+    init: true

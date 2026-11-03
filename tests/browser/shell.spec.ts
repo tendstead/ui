@@ -1,12 +1,11 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from '../fixtures/test';
 import AxeBuilder from '@axe-core/playwright';
-test.beforeEach(async ({page}) => { page.on('pageerror', error => { throw error; }); });
 test('desktop uses registry for active nested routes, zero badges and optional services', async ({page}) => {
   await page.goto('/?route=/receipts/review/42&services=1&account=1');
   const nav=page.getByRole('navigation',{name:'Main navigation',exact:true});
   await expect(nav.getByRole('link',{name:'Review queue'})).toHaveAttribute('aria-current','page');
   await expect(nav.getByRole('link',{name:'Receipts 0'})).toBeVisible();
-  await expect(page.getByRole('navigation',{name:'Connected services'}).getByRole('link',{name:'Downloader'})).toHaveAttribute('href','https://downloader.example.test/');
+  await expect(page.getByRole('navigation',{name:'Connected services'}).getByRole('link',{name:'Shopping list'})).toHaveAttribute('href','https://shopping.example.test/');
   await expect(page.getByRole('button',{name:'Alex · local account'})).toBeVisible();
   await nav.getByRole('link',{name:'Search'}).click();
   await expect(page.getByRole('heading',{name:'Search',exact:true})).toBeVisible();

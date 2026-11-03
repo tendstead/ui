@@ -1,0 +1,26 @@
+export const viewports = [
+  { width: 393, height: 430 }, { width: 360, height: 740 }, { width: 393, height: 873 },
+  { width: 873, height: 393 }, { width: 1280, height: 800 },
+  { width: 1440, height: 900 }, { width: 767, height: 800 },
+  { width: 768, height: 800 }, { width: 769, height: 800 },
+];
+export const visuals = [
+  { name:'receipts-end-content',width:360,height:740,query:'long=1',end:true },
+  { name:'receipts-short-drawer',width:393,height:430,query:'long=1&services=1&account=1',drawer:true },
+  { name:'receipts-phone', width:360,height:740,query:'' },
+  { name:'receipts-phone-dark',width:393,height:873,query:'theme=dark&services=1&account=1' },
+  { name:'receipts-phone-long',width:360,height:740,query:'long=1' },
+  { name:'receipts-landscape',width:873,height:393,query:'services=1&account=1' },
+  { name:'receipts-desktop',width:1280,height:800,query:'services=1&account=1&admin=1&route=/receipts/review/42' },
+  { name:'receipts-wide-dark-long',width:1440,height:900,query:'theme=dark&long=1&services=1&account=1' },
+  { name:'receipts-below-breakpoint',width:767,height:800,query:'' },
+  { name:'receipts-at-breakpoint',width:768,height:800,query:'long=1' },
+  { name:'receipts-above-breakpoint',width:769,height:800,query:'' },
+  { name:'receipts-drawer',width:393,height:873,query:'services=1&account=1',drawer:true },
+  { name:'receipts-drawer-dark-long',width:360,height:740,query:'theme=dark&long=1&services=1&account=1',drawer:true },
+  { name:'downloader-phone',width:393,height:873,query:'app=downloader' },
+  { name:'downloader-phone-dark-long',width:360,height:740,query:'app=downloader&theme=dark&long=1' },
+  { name:'downloader-desktop',width:1280,height:800,query:'app=downloader&services=1' },
+  { name:'downloader-drawer',width:393,height:873,query:'app=downloader&theme=dark',drawer:true },
+  { name:'receipt-form',width:393,height:873,query:'route=/add' },
+];

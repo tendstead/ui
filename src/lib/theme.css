@@ -17,7 +17,7 @@
 }
 .ts-shell { color:var(--ts-text); background:var(--ts-surface); font-family:var(--ts-font); font-size:16px; line-height:1.5; min-height:100dvh; }
 .ts-shell *, .ts-shell *::before, .ts-shell *::after { box-sizing:border-box; }
-.ts-shell a { color:inherit; text-decoration:none; }
+.ts-nav-link, .ts-skip, a.ts-action { color:inherit; text-decoration:none; }
 .ts-shell button { font:inherit; cursor:pointer; }
 .ts-shell :focus-visible { outline:3px solid var(--ts-focus); outline-offset:3px; }
 .ts-shell-background { display:grid; grid-template-columns:256px minmax(0,1fr); min-height:100dvh; }
