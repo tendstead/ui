@@ -14,7 +14,9 @@ Choose exactly one release label on each PR: `release:none`, `release:patch`,
 the code will still be included in the next release of the branch.
 The Release label check validates selection. Configure it as a required check in
 the repository's branch rules to prevent merging without a decision.
-The release workflow creates missing labels automatically on `main`.
+Create labels once with Actions → Set up release labels → Run workflow, or
+create them manually. Maintainers select release impact; the PR template does
+not ask contributors to choose a label.
 See [the release guide](docs/releases.md) for publication and recovery details.
 
 ## Local development
@@ -30,18 +32,21 @@ Run `npm ci`, then `npm run dev`. The package watcher writes built exports and V
 
 Playwright and its image must both remain **1.63.0**. Screenshot references use Chromium on `mcr.microsoft.com/playwright:v1.63.0-noble`, deterministic system fonts, en-US locale, Europe/Berlin timezone, reduced motion and fixed data. No external media is loaded. Do not update references on the host or from Firefox/WebKit. The focused 18-image matrix covers both apps, light/dark, long labels, services/account present/absent, zero badges, open drawers, short-height mobile, form content, and the desktop breakpoint. Behavior tests cover all specified viewports plus 767/768/769 px and 393x430 short mobile.
 
-From this repository root on Linux:
+From this repository root on Linux, build the canonical browser image with
+the pinned Node 26 runtime first:
 
 ```sh
+docker build -f Dockerfile.test -t tendstead-ui-test:local .
+
 # Compare (missing references fail; this command does not create them).
 docker run --rm --ipc=host --user "$(id -u):$(id -g)" \
   -e HOME=/tmp -e CI=1 -v "$PWD:/work" -w /work \
-  mcr.microsoft.com/playwright:v1.63.0-noble npm run verify
+  tendstead-ui-test:local npm run verify
 
 # Explicit reference update only after deciding the visual change is intended.
 docker run --rm --ipc=host --user "$(id -u):$(id -g)" \
   -e HOME=/tmp -e CI=1 -v "$PWD:/work" -w /work \
-  mcr.microsoft.com/playwright:v1.63.0-noble npm run test:visual:update
+  tendstead-ui-test:local npm run test:visual:update
 ```
 
 The mounted commands require Linux-compatible `node_modules` from `npm ci`. Docker Compose's test service alternatively installs dependencies in its image and exports reports. Compose containers may create report files as root; use the mounted command above to preserve host ownership. Do not add automatic baseline updates to CI. The config defaults to `updateSnapshots: 'none'`; the separate update command is the sole intended write path.

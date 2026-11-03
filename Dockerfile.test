@@ -1,4 +1,6 @@
+FROM node:26.13.0-bookworm-slim AS node-runtime
 FROM mcr.microsoft.com/playwright:v1.63.0-noble
+COPY --from=node-runtime /usr/local/ /usr/local/
 WORKDIR /work
 COPY package.json package-lock.json ./
 RUN npm ci

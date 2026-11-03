@@ -1,0 +1,26 @@
+name: Set up release labels
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  labels:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
+        with:
+          script: |
+            const existing = await github.paginate(github.rest.issues.listLabelsForRepo, {...context.repo, per_page: 100});
+            const definitions = [
+              ['release:none', 'cccccc', 'Do not request a release from this PR'],
+              ['release:patch', '0e8a16', 'Release a compatible bug fix'],
+              ['release:minor', '1d76db', 'Release functionality or a breaking change during 0.x'],
+              ['release:major', 'b60205', 'Release a breaking change after 1.0']
+            ];
+            for (const [name, color, description] of definitions) {
+              if (!existing.some(label => label.name === name)) {
+                await github.rest.issues.createLabel({...context.repo, name, color, description});
+              }
+            }

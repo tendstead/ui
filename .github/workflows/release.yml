@@ -9,26 +9,6 @@ concurrency:
   group: release-main
   cancel-in-progress: false
 jobs:
-  labels:
-    runs-on: ubuntu-latest
-    permissions:
-      issues: write
-    steps:
-      - uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
-        with:
-          script: |
-            const existing = await github.paginate(github.rest.issues.listLabelsForRepo, {...context.repo, per_page: 100});
-            const definitions = [
-              ['release:none', 'cccccc', 'Do not request a release from this PR'],
-              ['release:patch', '0e8a16', 'Release a compatible bug fix'],
-              ['release:minor', '1d76db', 'Release functionality or a breaking change during 0.x'],
-              ['release:major', 'b60205', 'Release a breaking change after 1.0']
-            ];
-            for (const [name, color, description] of definitions) {
-              if (!existing.some(label => label.name === name)) {
-                await github.rest.issues.createLabel({...context.repo, name, color, description});
-              }
-            }
   plan:
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
@@ -50,7 +30,7 @@ jobs:
           persist-credentials: false
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
-          node-version: '22.22.2'
+          node-version: '26.13.0'
       - name: Plan release
         id: plan
         uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
@@ -68,9 +48,10 @@ jobs:
           if-no-files-found: error
           retention-days: 7
   build:
+    name: Verify and pack release
     needs: plan
     if: needs.plan.outputs.version != ''
-    timeout-minutes: 30
+    timeout-minutes: 15
     outputs:
       version: ${{ needs.plan.outputs.version }}
       sha: ${{ needs.plan.outputs.sha }}
@@ -81,6 +62,9 @@ jobs:
     container:
       image: mcr.microsoft.com/playwright:v1.63.0-noble
       options: --ipc=host
+    env:
+      # GitHub mounts /github/home for another user; Firefox runs as root.
+      HOME: /root
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
@@ -88,7 +72,7 @@ jobs:
           persist-credentials: false
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
-          node-version: '22.22.2'
+          node-version: '26.13.0'
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
           artifact-ids: ${{ needs.plan.outputs.notes-id }}
@@ -135,7 +119,7 @@ jobs:
           persist-credentials: false
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
-          node-version: '22.22.2'
+          node-version: '26.13.0'
           registry-url: 'https://registry.npmjs.org'
       - name: Install pinned npm CLI with OIDC support
         run: npm install --global npm@11.19.0 --ignore-scripts
