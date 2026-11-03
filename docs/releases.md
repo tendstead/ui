@@ -55,10 +55,10 @@ A GitHub release inherits the visibility of its repository.
 ## Repository setup
 
 The workflows use the automatic `GITHUB_TOKEN` and OIDC identity; no npm token
-or personal access token is needed. Repository
-and organization Actions policy must allow the declared `contents: write` and
-`issues: write` permissions. Create release labels once using Actions → Set up release labels → Run workflow,
-or create them manually in Issues → Labels. Release runs do not create labels. Unlabelled
+or personal access token is needed. Repository and organization Actions policy
+must allow the permissions declared for each job. The four release labels
+already exist in this repository; maintainers can manage them in Issues → Labels.
+Release runs do not create labels. Unlabelled
 historical PRs are ignored for versioning and release notes.
 
 Make Release label / release-label and the existing verification job required

@@ -14,8 +14,7 @@ Choose exactly one release label on each PR: `release:none`, `release:patch`,
 the code will still be included in the next release of the branch.
 The Release label check validates selection. Configure it as a required check in
 the repository's branch rules to prevent merging without a decision.
-Create labels once with Actions → Set up release labels → Run workflow, or
-create them manually. Maintainers select release impact; the PR template does
+The release labels already exist in this repository. Maintainers select release impact; the PR template does
 not ask contributors to choose a label.
 See [the release guide](docs/releases.md) for publication and recovery details.
 
