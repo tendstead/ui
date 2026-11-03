@@ -28,7 +28,7 @@
     "dist"
   ],
   "peerDependencies": {
-    "svelte": "^5.0.0"
+    "svelte": "^5.20.0"
   },
   "dependencies": {
     "@melt-ui/svelte": "0.86.6"
