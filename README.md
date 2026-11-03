@@ -15,6 +15,10 @@ Requires Node 22 and Svelte >=5.20. The demo consumes the package's built export
 
 Build and `npm pack` locally, then install the resulting tarball in your app. Import the theme explicitly; no Tailwind, reset or SvelteKit required.
 
+Release-labelled PRs automatically publish versioned tarballs on GitHub after
+verification and publish the same package to npm through trusted publishing.
+See [the release guide](docs/releases.md) for labels, installation, and retry instructions.
+
 ```svelte
 <script lang="ts">
   import { AppShell, type Destination } from '@tendstead/ui';

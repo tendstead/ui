@@ -1,0 +1,21 @@
+name: Release label
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, labeled, unlabeled, ready_for_review]
+permissions:
+  contents: read
+  pull-requests: read
+jobs:
+  release-label:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
+        with:
+          script: |
+            const {data: labels} = await github.rest.issues.listLabelsOnIssue({
+              ...context.repo, issue_number: context.issue.number, per_page: 100
+            });
+            const selected = labels.map(l => l.name).filter(l => l.startsWith('release:'));
+            if (selected.length !== 1 || !/^release:(none|patch|minor|major)$/.test(selected[0])) {
+              core.setFailed('Apply exactly one of release:none, release:patch, release:minor, release:major.');
+            }

@@ -1,6 +1,28 @@
 # Contributing
 
-Keep changes local and the package private. Preserve app boundaries; do not introduce backend behavior, publish, choose a license, or deploy as part of UI work.
+## Pull requests and issues
+
+Use the PR template to describe the change, validation, release impact, and
+whether AI was used. When AI was used, name the tools and models if known,
+describe their contribution, and explain how the work was reviewed and validated.
+Use the bug report or feature request form when opening an issue.
+
+Choose exactly one release label on each PR: `release:none`, `release:patch`,
+`release:minor`, or `release:major`. During `0.x`, breaking changes use
+`release:minor` and must include migration notes; after `1.0`, they use
+`release:major`. `release:none` means this merge does not request a release;
+the code will still be included in the next release of the branch.
+The Release label check validates selection. Configure it as a required check in
+the repository's branch rules to prevent merging without a decision.
+The release workflow creates missing labels automatically on `main`.
+See [the release guide](docs/releases.md) for publication and recovery details.
+
+## Local development
+
+Keep ordinary UI work local until reviewed. Preserve app boundaries;
+do not introduce backend behavior, choose a license, deploy, or publish manually
+as part of UI work. Publication from merged release-labelled PRs is handled by
+the release workflow, including npm trusted publishing.
 
 Run `npm ci`, then `npm run dev`. The package watcher writes built exports and Vite reloads the consuming demo. For a change, add a test for the observable break first; run `npm run verify` before review. `test:consumer` packs the real package and installs it into a fresh temporary directory, builds a standalone app, and SSR-renders it without browser globals. It requires npm registry/cache access and removes its fixture afterward.
 
