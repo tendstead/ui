@@ -1,5 +1,5 @@
-FROM node:26.13.0-bookworm-slim AS node-runtime
-FROM mcr.microsoft.com/playwright:v1.63.0-noble
+FROM node:26.13.1-bookworm-slim AS node-runtime
+FROM mcr.microsoft.com/playwright:v1.64.1-noble
 COPY --from=node-runtime /usr/local/ /usr/local/
 WORKDIR /work
 COPY package.json package-lock.json ./

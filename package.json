@@ -48,15 +48,15 @@
   },
   "devDependencies": {
     "@axe-core/playwright": "4.14.0",
-    "@lucide/svelte": "1.67.0",
-    "@playwright/test": "1.63.0",
-    "@sveltejs/package": "2.5.8",
-    "@sveltejs/vite-plugin-svelte": "6.2.4",
+    "@lucide/svelte": "1.72.0",
+    "@playwright/test": "1.64.1",
+    "@sveltejs/package": "3.0.2",
+    "@sveltejs/vite-plugin-svelte": "7.3.1",
     "svelte": "5.57.3",
     "svelte-check": "4.7.8",
-    "typescript": "5.9.3",
-    "vite": "7.3.7",
-    "vitest": "4.1.12"
+    "typescript": "6.0.3",
+    "vite": "8.3.8",
+    "vitest": "5.1.0"
   },
   "sideEffects": [
     "**/*.css"
