@@ -29,7 +29,7 @@ Run `npm ci`, then `npm run dev`. The package watcher writes built exports and V
 
 ## Canonical screenshots
 
-Playwright and its image must both remain **1.63.0**. Screenshot references use Chromium on `mcr.microsoft.com/playwright:v1.63.0-noble`, deterministic system fonts, en-US locale, Europe/Berlin timezone, reduced motion and fixed data. No external media is loaded. Do not update references on the host or from Firefox/WebKit. The focused 18-image matrix covers both apps, light/dark, long labels, services/account present/absent, zero badges, open drawers, short-height mobile, form content, and the desktop breakpoint. Behavior tests cover all specified viewports plus 767/768/769 px and 393x430 short mobile.
+Playwright and its image must both remain **1.64.1**. Screenshot references use Chromium on `mcr.microsoft.com/playwright:v1.64.1-noble`, deterministic system fonts, en-US locale, Europe/Berlin timezone, reduced motion and fixed data. No external media is loaded. Do not update references on the host or from Firefox/WebKit. The focused 18-image matrix covers both apps, light/dark, long labels, services/account present/absent, zero badges, open drawers, short-height mobile, form content, and the desktop breakpoint. Behavior tests cover all specified viewports plus 767/768/769 px and 393x430 short mobile.
 
 From this repository root on Linux, build the canonical browser image with
 the pinned Node 26 runtime first:

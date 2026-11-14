@@ -77,7 +77,7 @@ requests `actions: write` solely to dispatch the follow-up scan. The npm
 subprocess receives the verified source SHA for its provenance source revision,
 while preserving the actual workflow run identity.
 
-The publisher installs npm CLI `11.19.0` explicitly for OIDC support. Actions
+The publisher installs npm CLI `12.2.2` explicitly for OIDC support. Actions
 are pinned to full commit hashes. Release jobs do not restore dependency caches;
 the publisher does not install the library's dependencies or run its lifecycle
 scripts. Keep branch rules and repository write access restricted to trusted
