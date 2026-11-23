@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { AppShell, type Destination } from '@tendstead/ui';
+  import { AppShell, Modal, type Destination } from '@tendstead/ui';
   import { LayoutDashboard, ReceiptText, Search, Plus, Settings, ListChecks, FolderDown, Download, History, CircleHelp, ArrowUpRight, FileText } from '@lucide/svelte';
   const query=new URLSearchParams(window.location.search);
   const downloader=query.get('app')==='downloader';
@@ -12,6 +12,8 @@
   let permitted=$state(query.get('denied')!=='1');
   let showAdmin=$state(query.get('admin')==='1');
   let mounted=$state(true);
+  let modalOpen=$state(false);
+  let modalTrigger=$state<HTMLButtonElement>();
   let pathname=$state(query.get('route')??window.location.pathname);
   let status=$state('');
   let url=$state('');
@@ -70,6 +72,25 @@
       {/if}
       <div class="demo-stats"><section class="demo-stat"><p>{downloader?'In the queue':'This month'}</p><strong>{downloader?queued:'€284.50'}</strong><span>{downloader?'Ready when you are':'Across 12 receipts'}</span></section><section class="demo-stat"><p>{downloader?'Completed':'Ready to review'}</p><strong>{downloader?'18':'3'}</strong><span>{downloader?'Sample downloads':'A quick check is all it takes'}</span></section><section class="demo-stat"><p>{downloader?'Storage used':'Your archive'}</p><strong>{downloader?'2.4 GB':'148'}</strong><span>{downloader?'Synthetic files':'Receipts, neatly kept'}</span></section></div>
       <section class="demo-card" aria-labelledby="activity-title"><div class="demo-card-header"><div><p class="demo-kicker">AT A GLANCE</p><h2 id="activity-title">{downloader?'Recent downloads':'Recent receipts'}</h2></div><span class="demo-tag">Sample data</span></div><div class="demo-items">{#each (downloader?['Household manual.pdf','Weekend photos.zip','Garden notes.txt']:['Weekly groceries','Home essentials','Coffee with friends','Garden supplies']) as label,index}<div class="demo-item"><span class="demo-file-icon" aria-hidden="true"><FileText size={20}/></span><div><strong>{label}</strong><span>{['31 October 2026','29 October 2026','28 October 2026','26 October 2026'][index]} · {downloader?'Complete':'Personal'}</span></div><span class="demo-item-value">{downloader?['4.2 MB','128 MB','12 KB'][index]:['€68.40','€24.90','€12.80','€47.60'][index]}</span></div>{/each}</div></section>
+      {#if query.get('modal')==='1'}
+        <button
+          bind:this={modalTrigger}
+          class="demo-subtle-button"
+          type="button"
+          aria-haspopup="dialog"
+          aria-expanded={modalOpen}
+          onclick={() => (modalOpen = true)}
+        >Show details</button>
+        <Modal title="Sample details" closeLabel="Close details" bind:open={modalOpen} returnFocus={modalTrigger}>
+          <p>Entries in the sample archive</p>
+          <ol>
+            {#each Array(20) as _, index}
+              <li>Sample entry {index + 1}</li>
+            {/each}
+          </ol>
+          <button class="demo-subtle-button" type="button" onclick={() => (modalOpen = false)}>Done</button>
+        </Modal>
+      {/if}
       <details class="demo-fixtures" open={query.get('controls')==='1'}><summary>Demo configuration</summary><div class="demo-controls"><label>Appearance<select bind:value={theme}><option value="light">Light</option><option value="dark">Dark</option></select></label><label><input type="checkbox" bind:checked={long}/>Long German labels</label><label><input type="checkbox" bind:checked={showServices}/>Show connected services</label><label><input type="checkbox" bind:checked={showAccount}/>Show account controls</label>{#if !downloader}<label><input type="checkbox" bind:checked={permitted}/>Allow receipt access</label>{/if}{#if !downloader}<label><input type="checkbox" bind:checked={showAdmin}/>Show Administration</label>{/if}<p class="demo-help">App servers must enforce permissions. These controls only change navigation presentation.</p></div></details>
       <section class="demo-card demo-notes"><h2>A place for the small things</h2><p>This page intentionally includes enough content to scroll. The shell keeps the last control clear of the mobile navigation.</p><p>Each household tool owns its data, routes, and permissions. Connected services are ordinary links to independently deployed apps.</p><button class="demo-subtle-button" type="button" onclick={()=>status='End of page action received'}>End of page action</button></section>
       <p role="status" class="demo-status">{status}</p>
