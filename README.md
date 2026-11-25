@@ -53,6 +53,29 @@ const serviceLinks = [
 
 Pass `serviceLinks` to the shell. Empty is the default, with no placeholder section. Services appear in the sidebar and complete mobile menu, never primary tabs. The shell does no discovery, probing, credential sharing or server communication. Visible/permitted flags only control presentation: each destination server must authorize access. Unsafe obvious non-navigation protocols are omitted. App configuration and contextual handoff/return paths remain app responsibilities.
 
+## Modal
+
+Use `Modal` for a titled overlay. Bind `open` to show or dismiss it from your app and receive updates when the user presses Escape or uses the close button. The browser makes the background inert and returns focus to the previously focused element. Pass `returnFocus` to specify a target, including when a pointer interaction opens the modal without focusing its trigger.
+
+```svelte
+<script lang="ts">
+  import { Modal } from '@tendstead/ui';
+  import '@tendstead/ui/theme.css';
+
+  let open = $state(false);
+  let trigger = $state<HTMLButtonElement>();
+</script>
+
+<button type="button" bind:this={trigger} aria-haspopup="dialog" onclick={() => (open = true)}>
+  Show details
+</button>
+<Modal title="Sample details" closeLabel="Close details" bind:open returnFocus={trigger}>
+  <p>Contents supplied by your app.</p>
+</Modal>
+```
+
+The close label defaults to `Close`. Long content scrolls inside the dialog. Set `--ts-modal-max-width` on an ancestor to override the default of `60rem`. Try the interactive example at `/?modal=1`.
+
 ## Theme and layout
 
 Set `data-theme="dark"` or `data-theme="light"` on an ancestor. Override `--ts-primary`, `--ts-on-primary`, `--ts-nav`, `--ts-on-nav`, `--ts-selection`, `--ts-on-selection`, `--ts-surface`, `--ts-surface-subtle`, `--ts-text`, `--ts-muted`, `--ts-border`, `--ts-focus`, and `--ts-font` there. Defaults use neutral surfaces and purple `#6750A4`; token changes need contrast review. Theme CSS applies shell geometry and box sizing inside the shell; ordinary content links retain app/browser styling. No external fonts or images are fetched.
